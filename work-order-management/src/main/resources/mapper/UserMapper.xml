@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.workorder.mapper.UserMapper">
+
+    <sql id="userColumns">
+        u.id, u.username, u.password, u.name, u.role, u.dept_id, u.status,
+        u.create_time, u.update_time, d.name AS dept_name
+    </sql>
+
+    <select id="findByUsername" resultType="com.workorder.domain.pojo.User">
+        SELECT
+        <include refid="userColumns"/>
+        FROM user u
+        LEFT JOIN dept d ON u.dept_id = d.id
+        WHERE u.username = #{username}
+        LIMIT 1
+    </select>
+
+    <select id="findByDeptIdAndRole" resultType="com.workorder.domain.pojo.User">
+        SELECT
+        <include refid="userColumns"/>
+        FROM user u
+        LEFT JOIN dept d ON u.dept_id = d.id
+        WHERE u.dept_id = #{deptId}
+          AND u.role = #{role}
+          AND u.status = 1
+        ORDER BY u.id
+        LIMIT 1
+    </select>
+
+    <select id="findByRole" resultType="com.workorder.domain.pojo.User">
+        SELECT
+        <include refid="userColumns"/>
+        FROM user u
+        LEFT JOIN dept d ON u.dept_id = d.id
+        WHERE u.role = #{role}
+          AND u.status = 1
+        ORDER BY u.id
+        LIMIT 1
+    </select>
+
+    <select id="findAll" resultType="com.workorder.domain.pojo.User">
+        SELECT
+        <include refid="userColumns"/>
+        FROM user u
+        LEFT JOIN dept d ON u.dept_id = d.id
+        <where>
+            u.status = 1
+            <if test="keyword != null and keyword != ''">
+                AND (u.name LIKE CONCAT('%', #{keyword}, '%')
+                     OR u.username LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+        ORDER BY u.id
+    </select>
+
+</mapper>

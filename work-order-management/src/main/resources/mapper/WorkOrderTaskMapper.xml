@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.workorder.mapper.WorkOrderTaskMapper">
+
+    <select id="findByOrderId" resultType="com.workorder.domain.pojo.WorkOrderTask">
+        SELECT t.id, t.work_order_id, t.flow_id, t.node_id, t.node_order,
+               t.approver_id, t.status, t.round, t.add_sign, t.comment,
+               t.create_time, t.update_time,
+               u.name AS approver_name, n.node_name
+        FROM work_order_task t
+        LEFT JOIN user u ON t.approver_id = u.id
+        LEFT JOIN approval_flow_node n ON t.node_id = n.id
+        WHERE t.work_order_id = #{orderId}
+        ORDER BY t.round ASC, t.node_order ASC, t.id ASC
+    </select>
+
+    <select id="findUserPendingTask" resultType="com.workorder.domain.pojo.WorkOrderTask">
+        SELECT t.id, t.work_order_id, t.flow_id, t.node_id, t.node_order,
+               t.approver_id, t.status, t.round, t.add_sign, t.comment,
+               t.create_time, t.update_time
+        FROM work_order_task t
+        WHERE t.work_order_id = #{orderId}
+          AND t.approver_id = #{approverId}
+          AND t.round = #{round}
+          AND t.status = 0
+        ORDER BY t.node_order DESC, t.id DESC
+        LIMIT 1
+    </select>
+
+    <select id="findPendingByNode" resultType="com.workorder.domain.pojo.WorkOrderTask">
+        SELECT t.id, t.work_order_id, t.flow_id, t.node_id, t.node_order,
+               t.approver_id, t.status, t.round, t.add_sign, t.comment,
+               t.create_time, t.update_time
+        FROM work_order_task t
+        WHERE t.work_order_id = #{orderId}
+          AND t.round = #{round}
+          AND t.node_id = #{nodeId}
+          AND t.status = 0
+        ORDER BY t.id ASC
+    </select>
+
+    <select id="countPendingByNode" resultType="long">
+        SELECT COUNT(*)
+        FROM work_order_task
+        WHERE work_order_id = #{orderId}
+          AND round = #{round}
+          AND node_id = #{nodeId}
+          AND status = 0
+    </select>
+
+    <select id="countAddSignByNode" resultType="long">
+        SELECT COUNT(*)
+        FROM work_order_task
+        WHERE work_order_id = #{orderId}
+          AND round = #{round}
+          AND node_id = #{nodeId}
+          AND add_sign = 1
+    </select>
+
+    <select id="countByApprover" resultType="long">
+        SELECT COUNT(*)
+        FROM work_order_task
+        WHERE work_order_id = #{orderId}
+          AND approver_id = #{approverId}
+    </select>
+
+    <update id="updateTaskStatus">
+        UPDATE work_order_task
+        SET status = #{status},
+            comment = #{comment},
+            update_time = NOW()
+        WHERE id = #{id}
+          AND status = 0
+    </update>
+
+    <update id="invalidatePending">
+        UPDATE work_order_task
+        SET status = 4,
+            update_time = NOW()
+        WHERE work_order_id = #{orderId}
+          AND round = #{round}
+          AND status = 0
+        <if test="nodeId != null">
+            AND node_id = #{nodeId}
+        </if>
+        <if test="excludeTaskId != null">
+            AND id != #{excludeTaskId}
+        </if>
+    </update>
+
+    <update id="transferTask">
+        UPDATE work_order_task
+        SET approver_id = #{toUserId},
+            comment = #{comment},
+            update_time = NOW()
+        WHERE id = #{id}
+          AND status = 0
+    </update>
+
+</mapper>

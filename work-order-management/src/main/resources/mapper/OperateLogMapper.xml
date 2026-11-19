@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.workorder.mapper.OperateLogMapper">
+
+    <select id="findPage" resultType="com.workorder.domain.pojo.OperateLog">
+        SELECT l.id, l.operate_user_id, l.description, l.class_name, l.method_name,
+               l.method_params, l.return_value, l.cost_time, l.operate_time,
+               u.name AS operate_user_name
+        FROM operate_log l
+        LEFT JOIN user u ON l.operate_user_id = u.id
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (l.description LIKE CONCAT('%', #{keyword}, '%')
+                     OR u.name LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+        ORDER BY l.id DESC
+    </select>
+
+</mapper>

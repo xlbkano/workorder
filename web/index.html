@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>登录 - 内部工单审批管理系统</title>
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="/assets/style.css" />
+</head>
+<body class="login-body">
+  <div class="login-card">
+    <div class="brand-mark">&#128203;</div>
+    <h1 class="login-title">内部工单审批管理系统</h1>
+    <p class="login-sub">提交工单 · 多级审批 · 全程可追溯</p>
+
+    <form id="loginForm" novalidate>
+      <div class="form-row">
+        <label for="username">账号</label>
+        <input class="input" id="username" autocomplete="username"
+               placeholder="请输入登录账号" maxlength="20" />
+      </div>
+      <div class="form-row">
+        <label for="password">密码</label>
+        <input class="input" id="password" type="password" autocomplete="current-password"
+               placeholder="请输入密码" maxlength="20" />
+      </div>
+      <button class="btn btn-primary btn-block" id="loginBtn" type="submit">登 录</button>
+    </form>
+
+    <div class="demo-accounts">
+      <div class="demo-title">演示账号（密码均为 123456，点击自动填入）</div>
+      <div class="demo-list">
+        <button type="button" class="demo-chip" data-user="zhangsan">员工 张三</button>
+        <button type="button" class="demo-chip" data-user="lisi">主管 李四</button>
+        <button type="button" class="demo-chip" data-user="admin">管理员 admin</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/assets/login.js"></script>
+</body>
+</html>
